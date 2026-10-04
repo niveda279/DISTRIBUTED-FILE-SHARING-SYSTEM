@@ -1,0 +1,126 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: dfs_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dfsuser
+      POSTGRES_PASSWORD: dfspassword
+      POSTGRES_DB: dfsdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dfsuser -d dfsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Storage Node 1 ──────────────────────────────────────────
+  node1:
+    build:
+      context: ./storage_nodes
+      dockerfile: Dockerfile
+    container_name: dfs_node1
+    restart: unless-stopped
+    env_file: ./storage_nodes/node1/.env
+    environment:
+      NODE_NUM: "1"
+    ports:
+      - "8001:8001"
+    volumes:
+      - node1_files:/app/node1/files
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  # ── Storage Node 2 ──────────────────────────────────────────
+  node2:
+    build:
+      context: ./storage_nodes
+      dockerfile: Dockerfile
+    container_name: dfs_node2
+    restart: unless-stopped
+    env_file: ./storage_nodes/node2/.env
+    environment:
+      NODE_NUM: "2"
+    ports:
+      - "8002:8002"
+    volumes:
+      - node2_files:/app/node2/files
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  # ── Storage Node 3 ──────────────────────────────────────────
+  node3:
+    build:
+      context: ./storage_nodes
+      dockerfile: Dockerfile
+    container_name: dfs_node3
+    restart: unless-stopped
+    env_file: ./storage_nodes/node3/.env
+    environment:
+      NODE_NUM: "3"
+    ports:
+      - "8003:8003"
+    volumes:
+      - node3_files:/app/node3/files
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+
+  # ── Master Server (FastAPI) ─────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dfs_backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      node1:
+        condition: service_started
+      node2:
+        condition: service_started
+      node3:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql+asyncpg://dfsuser:dfspassword@postgres:5432/dfsdb
+      NODE1_URL: http://node1:8001
+      NODE2_URL: http://node2:8002
+      NODE3_URL: http://node3:8003
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:3000,http://localhost:80,http://localhost"
+
+  # ── Frontend (Vite dev server) ──────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dfs_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pg_data:
+  node1_files:
+  node2_files:
+  node3_files:
