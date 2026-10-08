@@ -3,15 +3,21 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 
-import LandingPage        from './pages/LandingPage';
-import LoginPage          from './pages/LoginPage';
-import RegisterPage       from './pages/RegisterPage';
-import Dashboard          from './pages/Dashboard';
-import MyFilesPage        from './pages/MyFilesPage';
-import SharedFilesPage    from './pages/SharedFilesPage';
-import SearchPage         from './pages/SearchPage';
-import NodesPage          from './pages/NodesPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
+import LandingPage          from './pages/LandingPage';
+import LoginPage            from './pages/LoginPage';
+import RegisterPage         from './pages/RegisterPage';
+import Dashboard            from './pages/Dashboard';
+import MyFilesPage          from './pages/MyFilesPage';
+import SharedFilesPage      from './pages/SharedFilesPage';
+import SearchPage           from './pages/SearchPage';
+import NodesPage            from './pages/NodesPage';
+import AdminDashboardPage   from './pages/AdminDashboardPage';
+import ClusterTopologyPage  from './pages/ClusterTopologyPage';
+import SelfHealingPage      from './pages/SelfHealingPage';
+import SimulationPage       from './pages/SimulationPage';
+import SecurityCenterPage   from './pages/SecurityCenterPage';
+import StorageAnalyticsPage from './pages/StorageAnalyticsPage';
+import FileDetailPage       from './pages/FileDetailPage';
 
 // Layout with sidebar for authenticated pages
 function AppLayout() {
@@ -58,16 +64,22 @@ export default function App() {
 
           {/* Authenticated */}
           <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/files"     element={<MyFilesPage />} />
-            <Route path="/shared"    element={<SharedFilesPage />} />
-            <Route path="/search"    element={<SearchPage />} />
-            <Route path="/nodes"     element={<NodesPage />} />
+            <Route path="/dashboard"  element={<Dashboard />} />
+            <Route path="/files"      element={<MyFilesPage />} />
+            <Route path="/files/:id"  element={<FileDetailPage />} />
+            <Route path="/shared"     element={<SharedFilesPage />} />
+            <Route path="/search"     element={<SearchPage />} />
+            <Route path="/nodes"      element={<NodesPage />} />
+            <Route path="/cluster"    element={<ClusterTopologyPage />} />
           </Route>
 
           {/* Admin only */}
           <Route element={<PrivateRoute adminOnly />}>
-            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin"                element={<AdminDashboardPage />} />
+            <Route path="/admin/healing"        element={<SelfHealingPage />} />
+            <Route path="/admin/simulation"     element={<SimulationPage />} />
+            <Route path="/admin/security"       element={<SecurityCenterPage />} />
+            <Route path="/admin/analytics"      element={<StorageAnalyticsPage />} />
           </Route>
 
           {/* Fallback */}

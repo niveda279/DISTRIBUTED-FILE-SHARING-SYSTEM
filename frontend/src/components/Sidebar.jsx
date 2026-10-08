@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Files, Share2, Search, Server, ShieldCheck,
-  LogOut, ChevronRight, Database,
+  LogOut, Database, Network, HeartPulse, Zap, Shield, BarChart2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,10 +11,15 @@ const navItems = [
   { to: '/shared',    icon: Share2,           label: 'Shared With Me' },
   { to: '/search',    icon: Search,           label: 'Search' },
   { to: '/nodes',     icon: Server,           label: 'Nodes' },
+  { to: '/cluster',   icon: Network,          label: 'Cluster Topology' },
 ];
 
 const adminItems = [
-  { to: '/admin', icon: ShieldCheck, label: 'Admin Panel' },
+  { to: '/admin',            icon: ShieldCheck, label: 'Admin Panel' },
+  { to: '/admin/healing',    icon: HeartPulse,  label: 'Self-Healing' },
+  { to: '/admin/simulation', icon: Zap,         label: 'Chaos Simulation' },
+  { to: '/admin/security',   icon: Shield,      label: 'Security Center' },
+  { to: '/admin/analytics',  icon: BarChart2,   label: 'Analytics' },
 ];
 
 export default function Sidebar() {

@@ -106,6 +106,10 @@ services:
       NODE2_URL: http://node2:8002
       NODE3_URL: http://node3:8003
       CORS_ORIGINS: "http://localhost:5173,http://localhost:3000,http://localhost:80,http://localhost"
+      REPLICATION_FACTOR: "2"
+      SELF_HEALING_ENABLED: "true"
+      DEDUPLICATION_ENABLED: "true"
+      NODE_METRICS_RETENTION_HOURS: "24"
 
   # ── Frontend (Vite dev server) ──────────────────────────────
   frontend:

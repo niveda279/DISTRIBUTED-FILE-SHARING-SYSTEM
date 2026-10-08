@@ -31,8 +31,13 @@ BASE_DIR     = _app_root / NODE_ID
 STORAGE_DIR  = BASE_DIR / "files"
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
+# ──────────────────────────────────────────────────────────────
 # Track whether this node is administratively disabled
 DISABLED_FLAG = BASE_DIR / ".disabled"
+
+# In-memory counters (reset on restart)
+_request_count = 0
+_start_time = time.time()
 
 
 # ──────────────────────── Helpers ───────────────────────────
@@ -88,10 +93,16 @@ app.add_middleware(
 @app.get("/health")
 async def health_check():
     """Node health endpoint polled by the master server."""
+    global _request_count
+    t0 = time.time()
+
     if is_disabled():
         raise HTTPException(status_code=503, detail="Node is administratively disabled")
 
+    _request_count += 1
     info = get_storage_info()
+    latency_ms = round((time.time() - t0) * 1000, 2)
+
     return {
         "node_id":           NODE_ID,
         "node_name":         NODE_NAME,
@@ -100,6 +111,9 @@ async def health_check():
         "total_storage":     info["total_storage"],
         "used_storage":      info["used_storage"],
         "file_count":        info["file_count"],
+        "request_count":     _request_count,
+        "response_latency_ms": latency_ms,
+        "uptime_seconds":    round(time.time() - _start_time, 1),
         "timestamp":         datetime.now(timezone.utc).isoformat(),
     }
 
@@ -190,6 +204,14 @@ async def get_checksum(file_id: str):
 
     checksum = sha256_file(file_path)
     return {"node_id": NODE_ID, "file_id": safe_id, "checksum": checksum}
+
+
+@app.get("/files/{file_id}/exists")
+async def file_exists(file_id: str):
+    """Lightweight existence check without downloading the file."""
+    safe_id = "".join(c for c in file_id if c.isalnum() or c in "-_")
+    file_path = STORAGE_DIR / safe_id
+    return {"node_id": NODE_ID, "file_id": safe_id, "exists": file_path.exists()}
 
 
 @app.get("/")

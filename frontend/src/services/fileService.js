@@ -71,6 +71,44 @@ export const fileService = {
     await api.delete(`/api/files/${fileId}/permissions/${permId}`);
   },
 
+  // Versions
+  async getVersions(fileId) {
+    const { data } = await api.get(`/api/files/${fileId}/versions`);
+    return data;
+  },
+
+  async restoreVersion(fileId, versionId) {
+    const { data } = await api.post(`/api/files/${fileId}/restore/${versionId}`);
+    return data;
+  },
+
+  async downloadVersion(fileId, versionId, filename) {
+    const response = await api.get(`/api/files/${fileId}/versions/${versionId}/download`, { responseType: 'blob' });
+    const url = URL.createObjectURL(response.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  // Activity + replicas
+  async getActivity(fileId) {
+    const { data } = await api.get(`/api/files/${fileId}/activity`);
+    return data;
+  },
+
+  async getReplicas(fileId) {
+    const { data } = await api.get(`/api/files/${fileId}/replicas`);
+    return data;
+  },
+
+  // Extended search
+  async searchAdvanced(params) {
+    const { data } = await api.get('/api/files/search', { params });
+    return data;
+  },
+
   formatSize(bytes) {
     if (!bytes) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -89,3 +127,4 @@ export const fileService = {
     return 'other';
   },
 };
+

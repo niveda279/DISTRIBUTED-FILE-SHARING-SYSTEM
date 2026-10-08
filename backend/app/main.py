@@ -9,8 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import Base, engine
-from app.models import audit_log, file, file_location, file_permission, storage_node, user  # noqa: F401 – ensure tables are registered
+from app.models import (  # noqa: F401 – ensure tables are registered
+    audit_log, file, file_location, file_permission, storage_node, user,
+    file_version, system_event, node_metric, replication_event, simulation_state, security_event,
+)
 from app.routers import admin, auth, files, nodes, sharing
+from app.routers import cluster, simulation_router, healing_router, versioning_router, activity_router
 from app.services.health_monitor import start_health_monitor, stop_health_monitor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s")
@@ -65,8 +69,8 @@ async def lifespan(app: FastAPI):
 # ─────────────────────── App ──────────────────────────────────
 app = FastAPI(
     title="Distributed File Sharing System – Master API",
-    version="1.0.0",
-    description="Fault-tolerant distributed file sharing with replication and SHA-256 integrity.",
+    version="2.0.0",
+    description="Intelligent self-healing distributed file storage platform with chaos simulation, versioning, and deduplication.",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     lifespan=lifespan,
@@ -86,6 +90,11 @@ app.include_router(files.router)
 app.include_router(sharing.router)
 app.include_router(nodes.router)
 app.include_router(admin.router)
+app.include_router(cluster.router)
+app.include_router(simulation_router.router)
+app.include_router(healing_router.router)
+app.include_router(versioning_router.router)
+app.include_router(activity_router.router)
 
 
 @app.get("/")

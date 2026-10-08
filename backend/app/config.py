@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
+    # Advanced features
+    REPLICATION_FACTOR: int = 2
+    SELF_HEALING_ENABLED: bool = True
+    DEDUPLICATION_ENABLED: bool = True
+    NODE_METRICS_RETENTION_HOURS: int = 24
+
     @property
     def cors_origins_list(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",")]

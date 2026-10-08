@@ -1,8 +1,16 @@
-# Distributed File Sharing System (DCC)
+# Intelligent Self-Healing Distributed Storage Platform
 
-A full-stack, distributed file-sharing application designed with a React frontend, a FastAPI backend master server, multiple independent storage nodes, and PostgreSQL for metadata storage.
+A full-stack, distributed storage application engineered with a modern React frontend, a high-performance FastAPI master server, independent storage nodes, and PostgreSQL for metadata curation. This system transcends simple file sharing by offering advanced infrastructure controls natively simulating an enterprise SAN/NAS experience.
 
-## Prerequisites
+## ✨ Advanced Features
+
+* **Intelligent File Placement:** Dynamically calculates node health, latency, and load metrics to distribute storage efficiently. 
+* **Self-Healing & Replication:** Employs daemon monitoring to detect node failures and automatically replicate orphaned chunks to surviving nodes without single points of failure.
+* **Chaos Simulation Engine:** Features built-in administrative tools to intentionally degrade, throttle, or kill nodes to test operational resilience and view recovery metrics.
+* **File Versioning & Deduplication:** Tracks file history linearly to allow rollback and performs global hash-based deduplication to save redundant storage overhead during heavy workloads.
+* **Administrative Telemetry Dashboard:** Rich, real-time analytics to visualize cluster topology, monitor live I/O metrics, and audit system-wide security actions.
+
+## 🛠 Prerequisites
 
 Before running the project, make sure you have the following installed on your system:
 - **Docker Desktop** (Make sure the Docker daemon is fully started and running)
@@ -33,7 +41,7 @@ Once everything is up and running, you can interact with the system via your bro
 
 ### 3. Default Login Credentials
 You can log in to the frontend immediately using the pre-seeded System Admin account:
-- **Email:** `admin@dfs.local`
+- **Email:** `admin@dfs.com`
 - **Password:** `Admin@123`
 *(You can also use the UI to register your own accounts).*
 
